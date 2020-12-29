@@ -17,10 +17,10 @@ input               rst_i;
 input               start_i;
 input               mem_data_i;
 input               mem_ack_i;
-output reg[255:0]   mem_data_o;
-output reg[31:0]    mem_addr_o;
-output reg          mem_enable_o;
-output reg          mem_write_o;        
+output wire[255:0]  mem_data_o;
+output wire[31:0]   mem_addr_o;
+output wire         mem_enable_o;
+output wire         mem_write_o;        
 
 
 MUX32 Mux_Branch(
@@ -230,22 +230,22 @@ EX_MEM EX_MEM_Register(
 // Change this into dcache_sram and connect enable_i
 dcache dcache(
     // System clock, reset and stall
-    clk_i           (clk_i), 
-    rst_i           (rst_i),
+    .clk_i           (clk_i), 
+    .rst_i           (rst_i),
     // to Data Memory interface        
-    mem_data_i      (mem_data_i), 
-    mem_ack_i       (mem_ack_i),     
-    mem_data_o      (), 
-    mem_addr_o      (),     
-    mem_enable_o    (), 
-    mem_write_o     (), 
+    .mem_data_i      (mem_data_i), 
+    .mem_ack_i       (mem_ack_i),     
+    .mem_data_o      (mem_data_o), 
+    .mem_addr_o      (mem_addr_o),     
+    .mem_enable_o    (mem_enable_o), 
+    .mem_write_o     (mem_write_o), 
     // to CPU interface    
-    cpu_data_i      (EX_MEM_Register.ALUResult_o),
-    cpu_addr_i      (EX_MEM_Register.MemRead_o),
-    cpu_MemRead_i   (EX_MEM_Register.MemWrite_o),
-    cpu_MemWrite_i  (EX_MEM_Register.RS2data_o),
-    cpu_data_o      (), 
-    cpu_stall_o     ()
+    .cpu_data_i      (EX_MEM_Register.ALUResult_o),
+    .cpu_addr_i      (EX_MEM_Register.MemRead_o),
+    .cpu_MemRead_i   (EX_MEM_Register.MemWrite_o),
+    .cpu_MemWrite_i  (EX_MEM_Register.RS2data_o),
+    .cpu_data_o      (), 
+    .cpu_stall_o     ()
 );
 
 MEM_WB MEM_WB_Register(
