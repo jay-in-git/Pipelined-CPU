@@ -29,35 +29,35 @@ input                 rst_i;
 //
 // to Data_Memory interface        
 //
-input    [255:0]      mem_data_i; 
-input                 mem_ack_i; 
+input    [255:0]      mem_data_i;   // data from memory
+input                 mem_ack_i;    // acknowledge for stall
     
-output   [255:0]      mem_data_o; 
-output   [31:0]       mem_addr_o;
-output                mem_enable_o; 
-output                mem_write_o; 
+output   [255:0]      mem_data_o;   // data to be written to memory 
+output   [31:0]       mem_addr_o;   // address of data
+output                mem_enable_o; // if only mem_enable -> read
+output                mem_write_o;  // if mem_enable && mem_write -> write
     
 //    
 // to CPU interface            
 //    
-input    [31:0]       cpu_data_i; 
-input    [31:0]       cpu_addr_i;     
+input    [31:0]       cpu_data_i;      // data to be written to cache
+input    [31:0]       cpu_addr_i;      // address of data
 input                 cpu_MemRead_i; 
 input                 cpu_MemWrite_i; 
 
-output   [31:0]       cpu_data_o; 
-output                cpu_stall_o; 
+output   [31:0]       cpu_data_o;      // data to be transferred to CPU
+output                cpu_stall_o;     // if cache miss, stall pipeline
 
 //
 // to SRAM interface
 //
-wire    [3:0]         cache_sram_index;
-wire                  cache_sram_enable;
-wire    [24:0]        cache_sram_tag;
-wire    [255:0]       cache_sram_data;
-wire                  cache_sram_write;
-wire    [24:0]        sram_cache_tag;
-wire    [255:0]       sram_cache_data;
+wire    [3:0]         cache_sram_index;     // block index, derived from address from CPU
+wire                  cache_sram_enable;    // if only cache_sram_enable -> read
+wire    [24:0]        cache_sram_tag;       // cache tags, {valid, dirty, tags}
+wire    [255:0]       cache_sram_data;      // data to be written to sram
+wire                  cache_sram_write;     // if cache_sram_enable && cache_sram_write -> write
+wire    [24:0]        sram_cache_tag;       // cache tag returns from sram
+wire    [255:0]       sram_cache_data;      // data returns from sram
 wire                  sram_cache_hit;
 
 
@@ -91,18 +91,18 @@ wire                  cpu_req;
 reg     [31:0]        cpu_data;
 
 // to CPU interface
-assign    cpu_req     = cpu_MemRead_i | cpu_MemWrite_i;
-assign    cpu_tag     = cpu_addr_i[31:9];
-assign    cpu_index   = cpu_addr_i[8:5];
-assign    cpu_offset  = cpu_addr_i[4:0];
-assign    cpu_stall_o = ~hit & cpu_req;
-assign    cpu_data_o  = cpu_data; 
+assign    cpu_req     = cpu_MemRead_i | cpu_MemWrite_i;  // whether CPU need to access cache or not
+assign    cpu_tag     = cpu_addr_i[31:9];                // tags from CPU
+assign    cpu_index   = cpu_addr_i[8:5];                 // block index from CPU
+assign    cpu_offset  = cpu_addr_i[4:0];                 // byte offset from CPU
+assign    cpu_stall_o = ~hit & cpu_req;                  // if CPU access cache but cache miss, stall
+assign    cpu_data_o  = cpu_data;                        // assign data to be transferred to CPU to a reg
 
 // to SRAM interface
 assign    sram_valid = sram_cache_tag[24];
-assign    sram_dirty = sram_cache_tag[23];
+assign    sram_dirty = sram_cache_tag[23];      
 assign    sram_tag   = sram_cache_tag[22:0];
-assign    cache_sram_index  = cpu_index;
+assign    cache_sram_index  = cpu_index; 
 assign    cache_sram_enable = cpu_req;
 assign    cache_sram_write  = cache_write | write_hit;
 assign    cache_sram_tag    = {1'b1, cache_dirty, cpu_tag};    
@@ -123,7 +123,7 @@ assign    r_hit_data   = (hit) ? sram_cache_data : mem_data_i;
 // read data :  256-bit to 32-bit
 always@(cpu_offset or r_hit_data) begin
     // TODO: add your code here! (cpu_data=...?)
-    cpu_data = r_hit_data[cpu_offset * 8 +: 32]; 
+    cpu_data <= r_hit_data[cpu_offset * 8 +: 32]; 
 end
 
 
