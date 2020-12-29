@@ -3,7 +3,6 @@ module PC
     clk_i,
     rst_i,
     start_i,
-    stall_i,
     PCWrite_i,
     MemStall_i,
     pc_i,
@@ -29,7 +28,7 @@ always@(posedge clk_i or posedge rst_i) begin
         pc_o <= 32'b0;
     end  
     else begin
-        if (~stall_i && PCWrite_i && ~MemStall_i) begin
+        if (PCWrite_i && ~MemStall_i) begin
             if(start_i)
                 pc_o <= pc_i;
             else
