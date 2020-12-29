@@ -2,13 +2,25 @@ module CPU
 (
     clk_i, 
     rst_i,
-    start_i
+    start_i,
+    mem_data_i, 
+    mem_ack_i, 
+    mem_data_o, 
+    mem_addr_o,     
+    mem_enable_o, 
+    mem_write_o
 );
 
 // Ports
 input               clk_i;
 input               rst_i;
 input               start_i;
+input               mem_data_i;
+input               mem_ack_i;
+output reg[255:0]   mem_data_o;
+output reg[31:0]    mem_addr_o;
+output reg          mem_enable_o;
+output reg          mem_write_o;        
 
 
 MUX32 Mux_Branch(
@@ -31,6 +43,7 @@ PC PC(
     .start_i    (start_i),
     .PCWrite_i  (Hazard_Detection_Unit.PCWrite_o),  // not determined
     .pc_i       (Mux_Branch.data_o),
+    .MemStall_i (Dcache_Controller.cpu_stall_o),
     .pc_o       ()
 );
 
@@ -46,8 +59,9 @@ IF_ID IF_ID_Register(
     .stall_i    (Hazard_Detection_Unit.Stall_o),
     .flush_i    (And_Branch.Result_o),
     .PC_i       (PC.pc_o),
+    .MemStall_i (Dcache_Controller.cpu_stall_o),
     .IF_ID_o    (),
-    .PC_o       ()// Check if it's corresponding to ID_IF module
+    .PC_o       ()
 );
 
 Control Control(
@@ -127,6 +141,7 @@ ID_EX ID_EX_Register(
     .RS1addr_i  (IF_ID_Register.IF_ID_o[19:15]),
     .RS2addr_i  (IF_ID_Register.IF_ID_o[24:20]),
     .RDaddr_i   (IF_ID_Register.IF_ID_o[11:7]),
+    .MemStall_i (Dcache_Controller.cpu_stall_o),
     .RegWrite_o (),
     .MemtoReg_o (),
     .MemRead_o  (),
@@ -202,6 +217,7 @@ EX_MEM EX_MEM_Register(
     .ALUResult_i (ALU.data_o),
     .RS2data_i   (MUX_Forward_RS2.data_o),
     .RDaddr_i    (ID_EX_Register.RDaddr_o),
+    .MemStall_i  (Dcache_Controller.cpu_stall_o),
     .RegWrite_o  (),
     .MemtoReg_o  (),
     .MemRead_o   (),
@@ -210,14 +226,26 @@ EX_MEM EX_MEM_Register(
     .RS2data_o   (),
     .RDaddr_o    ()
 );
-// Change this into dcache_sram
-Data_Memory Data_Memory(
-    .clk_i      (clk_i),
-    .addr_i     (EX_MEM_Register.ALUResult_o),
-    .MemRead_i  (EX_MEM_Register.MemRead_o),
-    .MemWrite_i (EX_MEM_Register.MemWrite_o),
-    .data_i     (EX_MEM_Register.RS2data_o),
-    .data_o     ()
+
+// Change this into dcache_sram and connect enable_i
+dcache_controller Dcache_Controller(
+    // System clock, reset and stall
+    clk_i           (clk_i), 
+    rst_i           (rst_i),
+    // to Data Memory interface        
+    mem_data_i      (mem_data_i), 
+    mem_ack_i       (mem_ack_i),     
+    mem_data_o      (), 
+    mem_addr_o      (),     
+    mem_enable_o    (), 
+    mem_write_o     (), 
+    // to CPU interface    
+    cpu_data_i      (EX_MEM_Register.ALUResult_o),
+    cpu_addr_i      (EX_MEM_Register.MemRead_o),
+    cpu_MemRead_i   (EX_MEM_Register.MemWrite_o),
+    cpu_MemWrite_i  (EX_MEM_Register.RS2data_o),
+    cpu_data_o      (), 
+    cpu_stall_o     ()
 );
 
 MEM_WB MEM_WB_Register(
@@ -227,6 +255,7 @@ MEM_WB MEM_WB_Register(
     .ALUResult_i (EX_MEM_Register.ALUResult_o),
     .ReadData_i  (Data_Memory.data_o),
     .RDaddr_i    (EX_MEM_Register.RDaddr_o),
+    .MemStall_i  (Dcache_Controller.cpu_stall_o),
     .RegWrite_o  (),
     .MemtoReg_o  (),
     .ALUResult_o (),
