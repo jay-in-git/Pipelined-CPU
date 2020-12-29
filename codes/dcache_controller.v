@@ -33,7 +33,7 @@ input    [255:0]      mem_data_i;
 input                 mem_ack_i; 
     
 output   [255:0]      mem_data_o; 
-output   [31:0]       mem_addr_o;     
+output   [31:0]       mem_addr_o;
 output                mem_enable_o; 
 output                mem_write_o; 
     
@@ -128,6 +128,7 @@ end
 // write data :  32-bit to 256-bit
 always@(cpu_offset or r_hit_data or cpu_data_i) begin
     // TODO: add your code here! (w_hit_data=...?)
+
 end
 
 
@@ -156,7 +157,7 @@ always@(posedge clk_i or posedge rst_i) begin
                     state <= STATE_WRITEBACK;
                 end
                 else begin                    // write allocate: write miss = read miss + write hit; read miss = read miss + read hit
-                    // TODO: add your code here! 
+                    // TODO: add your code here!
                     state <= STATE_READMISS;
                 end
             end
