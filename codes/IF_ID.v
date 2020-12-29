@@ -22,7 +22,7 @@ always@(posedge clk_i) begin
         IF_ID_o <= 32'b0;
         PC_o    <= PC_i;
     end
-    else if(stall_i == 1'b0 and MemStall_i == 1'b0) begin
+    else if(stall_i == 1'b0 && MemStall_i == 1'b0) begin
         if(instr_i) begin
             IF_ID_o <= instr_i;
             PC_o    <= PC_i;
