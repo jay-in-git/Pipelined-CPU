@@ -128,7 +128,6 @@ always@(cpu_offset or r_hit_data) begin
     end
     else begin
         cpu_data = mem_data_i[(cpu_offset + 1) * 8 - 1:cpu_offset * 8];
-        cache_write = 1;
     end
 end
 
@@ -136,14 +135,8 @@ end
 // write data :  32-bit to 256-bit
 always@(cpu_offset or r_hit_data or cpu_data_i) begin
     // TODO: add your code here! (w_hit_data=...?)
-    if(hit) begin
-        w_hit_data = sram_cache_data;
-        w_hit_data[(cpu_offset + 1) * 8 - 1:cpu_offset * 8] = cpu_data_i;
-    end
-    else begin
-        w_hit_data = mem_data_i;
-        w_hit_data[(cpu_offset + 1) * 8 - 1:cpu_offset * 8] = cpu_data_i;
-    end
+    w_hit_data = sram_cache_data;
+    w_hit_data[(cpu_offset + 1) * 8 - 1:cpu_offset * 8] = cpu_data_i;
 end
 
 
