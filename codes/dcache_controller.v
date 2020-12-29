@@ -118,16 +118,32 @@ assign    write_hit    = hit & cpu_MemWrite_i;
 assign    cache_dirty  = write_hit;
 
 // TODO: add your code here!  (r_hit_data=...?)
-// 看起來是一個block 8 word
+assign    r_hit_data   = sram_cache_data;
+
 // read data :  256-bit to 32-bit
 always@(cpu_offset or r_hit_data) begin
     // TODO: add your code here! (cpu_data=...?)
+    if(hit) begin
+        cpu_data = r_hit_data[(cpu_offset * 4):(cpu_offset + 1) * 4 - 1]; 
+    end
+    else begin
+        cpu_data = mem_data_i[(cpu_offset * 4):(cpu_offset + 1) * 4 - 1];
+        cache_write = 1;
+    end
 end
 
 
 // write data :  32-bit to 256-bit
 always@(cpu_offset or r_hit_data or cpu_data_i) begin
     // TODO: add your code here! (w_hit_data=...?)
+    if(hit) begin
+        w_hit_data = sram_cache_data;
+        w_hit_data[(cpu_offset * 4):(cpu_offset + 1) * 4 - 1] = cpu_data_i;
+    end
+    else begin
+        w_hit_data = mem_data_i;
+        w_hit_data[(cpu_offset * 4):(cpu_offset + 1) * 4 - 1] = cpu_data_i;
+    end
 end
 
 
@@ -151,17 +167,22 @@ always@(posedge clk_i or posedge rst_i) begin
                 end
             end
             STATE_MISS: begin
-                if(sram_dirty) begin          // write back if dirty
+                if(sram_dirty) begin         
+                    // write back if dirty
                     // TODO: add your code here! 
+                    write_back <= 1;
+                    
                     state <= STATE_WRITEBACK;
                 end
-                else begin                    // write allocate: write miss = read miss + write hit; read miss = read miss + read hit
+                else begin  
+                    // write allocate: write miss = read miss + write hit; read miss = read miss + read hit
                     // TODO: add your code here! 
                     state <= STATE_READMISS;
                 end
             end
             STATE_READMISS: begin
-                if(mem_ack_i) begin            // wait for data memory acknowledge
+                if(mem_ack_i) begin
+                    // wait for data memory acknowledge
                     // TODO: add your code here! 
                     state <= STATE_READMISSOK;
                 end
@@ -169,12 +190,14 @@ always@(posedge clk_i or posedge rst_i) begin
                     state <= STATE_READMISS;
                 end
             end
-            STATE_READMISSOK: begin            // wait for data memory acknowledge
+            STATE_READMISSOK: begin
+                // wait for data memory acknowledge
                 // TODO: add your code here! 
                 state <= STATE_IDLE;
             end
             STATE_WRITEBACK: begin
-                if(mem_ack_i) begin            // wait for data memory acknowledge
+                if(mem_ack_i) begin
+                    // wait for data memory acknowledge
                     // TODO: add your code here! 
                     state <= STATE_READMISS;
                 end
