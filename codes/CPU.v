@@ -15,7 +15,7 @@ module CPU
 input               clk_i;
 input               rst_i;
 input               start_i;
-input               mem_data_i;
+input  wire[255:0]  mem_data_i;
 input               mem_ack_i;
 output wire[255:0]  mem_data_o;
 output wire[31:0]   mem_addr_o;
@@ -228,7 +228,7 @@ EX_MEM EX_MEM_Register(
 );
 
 // Change this into dcache_sram and connect enable_i
-dcache dcache(
+dcache_controller dcache(
     // System clock, reset and stall
     .clk_i           (clk_i), 
     .rst_i           (rst_i),
@@ -240,10 +240,10 @@ dcache dcache(
     .mem_enable_o    (mem_enable_o), 
     .mem_write_o     (mem_write_o), 
     // to CPU interface    
-    .cpu_data_i      (EX_MEM_Register.ALUResult_o),
-    .cpu_addr_i      (EX_MEM_Register.MemRead_o),
-    .cpu_MemRead_i   (EX_MEM_Register.MemWrite_o),
-    .cpu_MemWrite_i  (EX_MEM_Register.RS2data_o),
+    .cpu_data_i      (EX_MEM_Register.RS2data_o),
+    .cpu_addr_i      (EX_MEM_Register.ALUResult_o),
+    .cpu_MemRead_i   (EX_MEM_Register.MemRead_o),
+    .cpu_MemWrite_i  (EX_MEM_Register.MemWrite_o),
     .cpu_data_o      (), 
     .cpu_stall_o     ()
 );
@@ -253,7 +253,7 @@ MEM_WB MEM_WB_Register(
     .RegWrite_i  (EX_MEM_Register.RegWrite_o),
     .MemtoReg_i  (EX_MEM_Register.MemtoReg_o),
     .ALUResult_i (EX_MEM_Register.ALUResult_o),
-    .ReadData_i  (Data_Memory.data_o),
+    .ReadData_i  (dcache.cpu_data_o),
     .RDaddr_i    (EX_MEM_Register.RDaddr_o),
     .MemStall_i  (dcache.cpu_stall_o),
     .RegWrite_o  (),
