@@ -43,7 +43,7 @@ PC PC(
     .start_i    (start_i),
     .PCWrite_i  (Hazard_Detection_Unit.PCWrite_o),  // not determined
     .pc_i       (Mux_Branch.data_o),
-    .MemStall_i (Dcache_Controller.cpu_stall_o),
+    .MemStall_i (dcache.cpu_stall_o),
     .pc_o       ()
 );
 
@@ -59,7 +59,7 @@ IF_ID IF_ID_Register(
     .stall_i    (Hazard_Detection_Unit.Stall_o),
     .flush_i    (And_Branch.Result_o),
     .PC_i       (PC.pc_o),
-    .MemStall_i (Dcache_Controller.cpu_stall_o),
+    .MemStall_i (dcache.cpu_stall_o),
     .IF_ID_o    (),
     .PC_o       ()
 );
@@ -141,7 +141,7 @@ ID_EX ID_EX_Register(
     .RS1addr_i  (IF_ID_Register.IF_ID_o[19:15]),
     .RS2addr_i  (IF_ID_Register.IF_ID_o[24:20]),
     .RDaddr_i   (IF_ID_Register.IF_ID_o[11:7]),
-    .MemStall_i (Dcache_Controller.cpu_stall_o),
+    .MemStall_i (dcache.cpu_stall_o),
     .RegWrite_o (),
     .MemtoReg_o (),
     .MemRead_o  (),
@@ -217,7 +217,7 @@ EX_MEM EX_MEM_Register(
     .ALUResult_i (ALU.data_o),
     .RS2data_i   (MUX_Forward_RS2.data_o),
     .RDaddr_i    (ID_EX_Register.RDaddr_o),
-    .MemStall_i  (Dcache_Controller.cpu_stall_o),
+    .MemStall_i  (dcache.cpu_stall_o),
     .RegWrite_o  (),
     .MemtoReg_o  (),
     .MemRead_o   (),
@@ -228,7 +228,7 @@ EX_MEM EX_MEM_Register(
 );
 
 // Change this into dcache_sram and connect enable_i
-dcache_controller Dcache_Controller(
+dcache dcache(
     // System clock, reset and stall
     clk_i           (clk_i), 
     rst_i           (rst_i),
@@ -255,7 +255,7 @@ MEM_WB MEM_WB_Register(
     .ALUResult_i (EX_MEM_Register.ALUResult_o),
     .ReadData_i  (Data_Memory.data_o),
     .RDaddr_i    (EX_MEM_Register.RDaddr_o),
-    .MemStall_i  (Dcache_Controller.cpu_stall_o),
+    .MemStall_i  (dcache.cpu_stall_o),
     .RegWrite_o  (),
     .MemtoReg_o  (),
     .ALUResult_o (),
