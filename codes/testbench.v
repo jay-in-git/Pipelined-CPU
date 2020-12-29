@@ -79,6 +79,59 @@ initial begin
         CPU.Registers.register[i] = 32'b0;
     end
     // [RegisterInitialization] DO NOT REMOVE THIS FLAG !!!
+    CPU.IF_ID_Register.IF_ID_o = 32'b0;
+    CPU.IF_ID_Register.PC_o = 32'b0;
+
+    CPU.ID_EX_Register.RegWrite_o = 1'b0;
+    CPU.ID_EX_Register.MemtoReg_o = 1'b0;
+    CPU.ID_EX_Register.MemRead_o = 1'b0;
+    CPU.ID_EX_Register.MemWrite_o = 1'b0;
+    CPU.ID_EX_Register.ALUOp_o = 1'b0;
+    CPU.ID_EX_Register.ALUSrc_o = 1'b0;
+    CPU.ID_EX_Register.RS1data_o = 32'b0;
+    CPU.ID_EX_Register.RS2data_o = 32'b0;
+    CPU.ID_EX_Register.Imm_o = 32'b0;
+    CPU.ID_EX_Register.Func10_o = 10'b0;
+    CPU.ID_EX_Register.RS1addr_o = 5'b0;
+    CPU.ID_EX_Register.RS2addr_o = 5'b0;
+    CPU.ID_EX_Register.RDaddr_o = 5'b0;
+
+    CPU.EX_MEM_Register.RegWrite_o = 1'b0;
+    CPU.EX_MEM_Register.MemtoReg_o = 1'b0;
+    CPU.EX_MEM_Register.MemRead_o = 1'b0;
+    CPU.EX_MEM_Register.MemWrite_o = 1'b0;
+    CPU.EX_MEM_Register.ALUResult_o = 32'b0;
+    CPU.EX_MEM_Register.RS2data_o = 32'b0;
+    CPU.EX_MEM_Register.RDaddr_o = 5'b0;
+
+    CPU.MEM_WB_Register.ALUResult_o = 32'b0;
+    CPU.MEM_WB_Register.ReadData_o = 32'b0;
+    CPU.MEM_WB_Register.RDaddr_o = 5'b0;
+    CPU.MEM_WB_Register.RegWrite_o = 1'b0;
+    CPU.MEM_WB_Register.MemtoReg_o = 1'b0;
+
+    CPU.Hazard_Detection_Unit.NoOp_o = 1'b0;
+    CPU.Hazard_Detection_Unit.Stall_o = 1'b0;
+    CPU.Hazard_Detection_Unit.PCWrite_o = 1'b1;
+
+    CPU.Control.ALUOp_o = 2'b0;
+    CPU.Control.ALUSrc_o = 1'b0;
+    CPU.Control.RegWrite_o = 1'b0;
+    CPU.Control.MemWrite_o = 1'b0;
+    CPU.Control.MemRead_o = 1'b0;
+    CPU.Control.MemtoReg_o = 1'b0;
+    CPU.Control.Branch_o = 1'b0;
+
+    CPU.ALU_Control.ALUCtrl = 4'b1011;
+
+    CPU.Forwarding_Unit.ForwardA_o = 2'b00;
+    CPU.Forwarding_Unit.ForwardB_o = 2'b00;
+
+    CPU.Sign_Extend.extension = 32'b0;
+    CPU.Sign_Extend.tmp_extension = 12'b0;
+
+    CPU.ALU.data_reg = 32'b0;
+    CPU.ALU.IsZero = 1'b0;
     
     // Load instructions into instruction memory
     // Make sure you change back to "instruction.txt" before submission

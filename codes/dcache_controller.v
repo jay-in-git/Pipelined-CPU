@@ -14,7 +14,7 @@ module dcache_controller
     
     // to CPU interface    
     cpu_data_i, 
-    cpu_addr_i,     
+    cpu_addr_i,
     cpu_MemRead_i, 
     cpu_MemWrite_i, 
     cpu_data_o, 
@@ -118,6 +118,7 @@ assign    write_hit    = hit & cpu_MemWrite_i;
 assign    cache_dirty  = write_hit;
 
 // TODO: add your code here!  (r_hit_data=...?)
+// 看起來是一個block 8 word
 // read data :  256-bit to 32-bit
 always@(cpu_offset or r_hit_data) begin
     // TODO: add your code here! (cpu_data=...?)

@@ -210,7 +210,7 @@ EX_MEM EX_MEM_Register(
     .RS2data_o   (),
     .RDaddr_o    ()
 );
-
+// Change this into dcache_sram
 Data_Memory Data_Memory(
     .clk_i      (clk_i),
     .addr_i     (EX_MEM_Register.ALUResult_o),
