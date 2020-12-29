@@ -41,6 +41,7 @@ PC PC(
     .clk_i      (clk_i),
     .rst_i      (rst_i),
     .start_i    (start_i),
+    .stall_i    (Hazard_Detection_Unit.Stall_o),
     .PCWrite_i  (Hazard_Detection_Unit.PCWrite_o),  // not determined
     .pc_i       (Mux_Branch.data_o),
     .MemStall_i (dcache.cpu_stall_o),
