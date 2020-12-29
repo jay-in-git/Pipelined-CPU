@@ -102,37 +102,37 @@ assign    cpu_data_o  = cpu_data;                        // assign data to be tr
 assign    sram_valid = sram_cache_tag[24];
 assign    sram_dirty = sram_cache_tag[23];      
 assign    sram_tag   = sram_cache_tag[22:0];
-assign    cache_sram_index  = cpu_index; 
-assign    cache_sram_enable = cpu_req;
-assign    cache_sram_write  = cache_write | write_hit;
-assign    cache_sram_tag    = {1'b1, cache_dirty, cpu_tag};    
-assign    cache_sram_data   = (hit) ? w_hit_data : mem_data_i;
-
+assign    cache_sram_index  = cpu_index;
+assign    cache_sram_enable = cpu_req;                          // cache is needed only if CPU issue a request
+assign    cache_sram_write  = cache_write | write_hit;          // cache_write: replace a block, write_hit: write data from CPU to cache
+assign    cache_sram_tag    = {1'b1, cache_dirty, cpu_tag};     // set valid bit to 1,
+assign    cache_sram_data   = (hit) ? w_hit_data : mem_data_i;  // data to be written to cache
+                                                                // miss -> replace a block from memory
+                                                                // hit -> write a block with data from CPU
 // to Data_Memory interface
-assign    mem_enable_o = mem_enable;
-assign    mem_addr_o   = (write_back) ? {sram_tag, cpu_index, 5'b0} : {cpu_tag, cpu_index, 5'b0};
-assign    mem_data_o   = sram_cache_data;
-assign    mem_write_o  = mem_write;
+assign    mem_enable_o = mem_enable;        // memory is needed only if cache miss
+assign    mem_addr_o   = (write_back) ? {sram_tag, cpu_index, 5'b0} : {cpu_tag, cpu_index, 5'b0}; // write_back: address from cache
+assign    mem_data_o   = sram_cache_data;   // block to be written to memory
+assign    mem_write_o  = mem_write;         // if only memory_enable -> read, if memory_enable && memory_write -> write
 
 assign    write_hit    = hit & cpu_MemWrite_i;
-assign    cache_dirty  = write_hit;
+assign    cache_dirty  = write_hit;         // if write hits -> data is only written to cache -> set dirty bit to 1
 
 // TODO: add your code here!  (r_hit_data=...?)
-assign    r_hit_data   = (hit) ? sram_cache_data : mem_data_i;
+assign    r_hit_data   = (hit) ? sram_cache_data : mem_data_i;  // if not hit, data is from memory, if hits, data is from cache
 
 // read data :  256-bit to 32-bit
 always@(cpu_offset or r_hit_data) begin
     // TODO: add your code here! (cpu_data=...?)
-    cpu_data <= r_hit_data[cpu_offset * 8 +: 32]; 
+    cpu_data = r_hit_data[cpu_offset * 8 +: 32]; 
 end
 
 
 // write data :  32-bit to 256-bit
 always@(cpu_offset or r_hit_data or cpu_data_i) begin
     // TODO: add your code here! (w_hit_data=...?)
-    w_hit_data <= r_hit_data;
-    w_hit_data[cpu_offset * 8 +: 32] <= cpu_data_i;
-        
+    w_hit_data = r_hit_data;
+    w_hit_data[cpu_offset * 8 +: 32] = cpu_data_i;
 end
 
 
@@ -156,7 +156,8 @@ always@(posedge clk_i or posedge rst_i) begin
                 end
             end
             STATE_MISS: begin
-                if(sram_dirty) begin         
+                if(sram_dirty) begin       
+                    // gotta replace a block  
                     // write back if dirty
                     // TODO: add your code here! 
                     write_back  <= 1;
@@ -165,7 +166,7 @@ always@(posedge clk_i or posedge rst_i) begin
                     cache_write <= 0;
                     state <= STATE_WRITEBACK;
                 end
-                else begin  
+                else begin
                     // write allocate: write miss = read miss + write hit; read miss = read miss + read hit
                     // TODO: add your code here! 
                     write_back  <= 0;
@@ -200,9 +201,9 @@ always@(posedge clk_i or posedge rst_i) begin
                     // wait for data memory acknowledge
                     // TODO: add your code here! 
                     write_back  <= 0;
-                    mem_enable  <= 0;
+                    mem_enable  <= 1;
                     mem_write   <= 0;
-                    cache_write <= 1;
+                    cache_write <= 0;
                     state <= STATE_READMISS;
                 end
                 else begin
