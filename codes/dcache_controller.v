@@ -102,16 +102,17 @@ assign    cpu_data_o  = cpu_data;                        // assign data to be tr
 assign    sram_valid = sram_cache_tag[24];
 assign    sram_dirty = sram_cache_tag[23];      
 assign    sram_tag   = sram_cache_tag[22:0];
-assign    cache_sram_index  = cpu_index; 
-assign    cache_sram_enable = cpu_req;
-assign    cache_sram_write  = cache_write | write_hit;
-assign    cache_sram_tag    = {1'b1, cache_dirty, cpu_tag};    
-assign    cache_sram_data   = (hit) ? w_hit_data : mem_data_i;
-
+assign    cache_sram_index  = cpu_index;
+assign    cache_sram_enable = cpu_req;                          // cache is needed only if CPU issue a request
+assign    cache_sram_write  = cache_write | write_hit;          // cache_write: replace a block, write_hit: write data from CPU to cache
+assign    cache_sram_tag    = {1'b1, cache_dirty, cpu_tag};     // set valid bit to 1,
+assign    cache_sram_data   = (hit) ? w_hit_data : mem_data_i;  // data to be written to cache
+                                                                // miss -> replace a block from memory
+                                                                // hit -> write a block with data from CPU
 // to Data_Memory interface
-assign    mem_enable_o = mem_enable;
+assign    mem_enable_o = mem_enable;        // memory is needed only if cache miss
 assign    mem_addr_o   = (write_back) ? {sram_tag, cpu_index, 5'b0} : {cpu_tag, cpu_index, 5'b0};
-assign    mem_data_o   = sram_cache_data;
+assign    mem_data_o   = sram_cache_data;   // block to be written to memory
 assign    mem_write_o  = mem_write;
 
 assign    write_hit    = hit & cpu_MemWrite_i;
@@ -132,7 +133,6 @@ always@(cpu_offset or r_hit_data or cpu_data_i) begin
     // TODO: add your code here! (w_hit_data=...?)
     w_hit_data <= r_hit_data;
     w_hit_data[cpu_offset * 8 +: 32] <= cpu_data_i;
-        
 end
 
 
@@ -200,7 +200,7 @@ always@(posedge clk_i or posedge rst_i) begin
                     // wait for data memory acknowledge
                     // TODO: add your code here! 
                     write_back  <= 0;
-                    mem_enable  <= 0;
+                    mem_enable  <= 1;
                     mem_write   <= 0;
                     cache_write <= 1;
                     state <= STATE_READMISS;
