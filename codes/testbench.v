@@ -73,7 +73,27 @@ initial begin
         end
     end
     // [D-CacheInitialization] DO NOT REMOVE THIS FLAG !!!
-    
+    CPU.dcache.state = 3'h0;
+    CPU.dcache.mem_enable = 1'b0;
+    CPU.dcache.mem_write = 1'b0;
+    CPU.dcache.cache_write = 1'b0;
+    CPU.dcache.write_back = 1'b0;
+    CPU.dcache.w_hit_data = 256'b0;
+    CPU.dcache.cpu_data = 32'b0;
+
+    for (i = 0; i < 16; i = i + 1) begin
+        CPU.dcache.dcache_sram.tag[i][0] = 25'b0;
+        CPU.dcache.dcache_sram.tag[i][1] = 25'b0;
+        CPU.dcache.dcache_sram.data[i][0] = 256'b0;
+        CPU.dcache.dcache_sram.data[i][1] = 256'b0;
+        CPU.dcache.dcache_sram.LRU_cache_index[i] = 1'b0;
+    end
+    CPU.dcache.dcache_sram.is_hit = 1'b0;
+    CPU.dcache.dcache_sram.data_o_reg = 256'b0;
+    CPU.dcache.dcache_sram.tag_o_reg = 25'b0;
+    CPU.dcache.dcache_sram.cache_index = 2'b10; // 00: first cache 01: second cache 10: none
+
+
     // initialize Register File
     for (i=0; i<32; i=i+1) begin
         CPU.Registers.register[i] = 32'b0;
@@ -135,7 +155,7 @@ initial begin
     
     // Load instructions into instruction memory
     // Make sure you change back to "instruction.txt" before submission
-    $readmemb("instruction.txt", CPU.Instruction_Memory.memory);
+    $readmemb("../testdata_public/instruction_1.txt", CPU.Instruction_Memory.memory);
     
     // Open output file
     // Make sure you change back to "output.txt" before submission
@@ -155,6 +175,9 @@ initial begin
     Data_Memory.memory[17] = 256'h0000_0110_0220_0330_0440_0550_0660_0770_0880_0990_0AA0_0BB0_0CC0_0DD0_0EE0_0FF0;
     Data_Memory.memory[32] = 256'h0000_1001_2002_3003_4004_5005_6006_7007_8008_9009_A00A_B00B_C00C_D00D_E00E_F00F;
     // [D-MemoryInitialization] DO NOT REMOVE THIS FLAG !!!
+    Data_Memory.data = 256'b0;
+    Data_Memory.count = 4'b0;
+    Data_Memory.state = 1'h0;
 
 end
   

@@ -36,8 +36,6 @@ reg        [1:0]        state;
 assign    ack_o = (state == STATE_WAIT) && (count == 4'd9); // 得到data，傳ack給cache controller
 assign    addr = addr_i>>5;
 assign    data_o = data;
-// State idle: 沒事做，等 enable 近來才開始拿 data、做懲罰
-// State wait: 等到 10 cycle 的懲罰做完
 always@(posedge clk_i or posedge rst_i) begin
     if(rst_i) begin
         state <= STATE_IDLE; 
@@ -46,7 +44,7 @@ always@(posedge clk_i or posedge rst_i) begin
     else begin
         case(state) 
             STATE_IDLE: begin
-                if(enable_i) begin // 計數9次加重置1次，總共10個cycle.
+                if(enable_i) begin 
                     state <= STATE_WAIT;
                     count <= count + 1;
                 end
