@@ -118,17 +118,12 @@ assign    write_hit    = hit & cpu_MemWrite_i;
 assign    cache_dirty  = write_hit;
 
 // TODO: add your code here!  (r_hit_data=...?)
-assign    r_hit_data   = sram_cache_data;
+assign    r_hit_data   = (hit) ? sram_cache_data : mem_data_i;
 
 // read data :  256-bit to 32-bit
 always@(cpu_offset or r_hit_data) begin
     // TODO: add your code here! (cpu_data=...?)
-    if(hit) begin
-        cpu_data = r_hit_data[(cpu_offset + 1) * 8 - 1:cpu_offset * 8]; 
-    end
-    else begin
-        cpu_data = mem_data_i[(cpu_offset + 1) * 8 - 1:cpu_offset * 8];
-    end
+    cpu_data = r_hit_data[(cpu_offset + 1) * 8 - 1:cpu_offset * 8]; 
 end
 
 
