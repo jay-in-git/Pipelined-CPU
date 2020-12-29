@@ -33,7 +33,7 @@ input    [255:0]      mem_data_i;
 input                 mem_ack_i; 
     
 output   [255:0]      mem_data_o; 
-output   [31:0]       mem_addr_o;     
+output   [31:0]       mem_addr_o;
 output                mem_enable_o; 
 output                mem_write_o; 
     
