@@ -104,7 +104,7 @@ assign    sram_valid = sram_cache_tag[24];
 assign    sram_dirty = sram_cache_tag[23];      
 assign    sram_tag   = sram_cache_tag[22:0];
 assign    cache_sram_index  = cpu_index;
-assign    cache_sram_enable = cache_enable;                     // cache is needed only if CPU issue a request
+assign    cache_sram_enable = cpu_req;                          // cache is needed only if CPU issue a request
 assign    cache_sram_write  = cache_write | write_hit;          // cache_write: replace a block, write_hit: write data from CPU to cache
 assign    cache_sram_tag    = {1'b1, cache_dirty, cpu_tag};     // set valid bit to 1,
 assign    cache_sram_data   = (hit) ? w_hit_data : mem_data_i;  // data to be written to cache
@@ -145,14 +145,12 @@ always@(posedge clk_i or posedge rst_i) begin
         mem_write   = 1'b0;
         cache_write = 1'b0; 
         write_back  = 1'b0;
-        cache_enable = 1'b0;
     end
     else begin
         case(state)        
             STATE_IDLE: begin
                 $display("IDLE: hit = %b, stall = %b\n", hit, cpu_stall_o);
                 if(cpu_req && !hit) begin      // wait for request
-                //    cache_enable = 1;
                     state = STATE_MISS;
                 end
                 else begin
@@ -168,7 +166,6 @@ always@(posedge clk_i or posedge rst_i) begin
                     mem_enable  = 1;
                     mem_write   = 1; 
                     cache_write = 0;
-                    cache_enable = 0;
                     state = STATE_WRITEBACK;
                 end
                 else begin
@@ -178,7 +175,6 @@ always@(posedge clk_i or posedge rst_i) begin
                     mem_enable  = 1;
                     mem_write   = 0;
                     cache_write = 0;
-                    cache_enable = 0;
                     state = STATE_READMISS;
                 end
             end
@@ -190,7 +186,6 @@ always@(posedge clk_i or posedge rst_i) begin
                     mem_enable  = 0;
                     mem_write   = 0;
                     cache_write = 1;
-                    cache_enable = 1;
                     state = STATE_READMISSOK;
                 end
                 else begin
@@ -202,7 +197,6 @@ always@(posedge clk_i or posedge rst_i) begin
                 $display("READMISSOK: hit = %b, stall = %b\n", hit, cpu_stall_o);
                 // TODO: add your code here! 
                 cache_write = 0;
-                cache_enable = 1;
                 state       = STATE_IDLE;
             end
             STATE_WRITEBACK: begin
@@ -213,7 +207,6 @@ always@(posedge clk_i or posedge rst_i) begin
                     mem_enable  = 1;
                     mem_write   = 0;
                     cache_write = 0;
-                    cache_enable = 0;
                     state = STATE_READMISS;
                 end
                 else begin
