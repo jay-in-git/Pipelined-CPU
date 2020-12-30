@@ -30,10 +30,7 @@ output             hit_o;
 reg      [24:0]    tag [0:15][0:1];    
 reg      [255:0]   data[0:15][0:1];
 integer            i, j;
-reg                is_hit;
 reg                LRU_cache_index[0:15];
-reg      [255:0]   data_o_reg;
-reg      [24:0]    tag_o_reg;
 
 wire     [1:0]     cache_index; // 00: first cache 01: second cache 10: none
 
