@@ -152,7 +152,7 @@ always@(posedge clk_i or posedge rst_i) begin
             STATE_IDLE: begin
                 $display("IDLE: hit = %b, stall = %b\n", hit, cpu_stall_o);
                 if(cpu_req && !hit) begin      // wait for request
-                    cache_enable = 1;
+                //    cache_enable = 1;
                     state = STATE_MISS;
                 end
                 else begin
