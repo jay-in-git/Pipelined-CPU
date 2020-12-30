@@ -48,9 +48,9 @@ always@(posedge clk_i or posedge rst_i) begin
             end
         end
     end
-    cache_index = 2'b10;
-    is_hit = 0;
-    data_o_reg = 25'b0;
+    cache_index <= 2'b10;
+    is_hit <= 0;
+    data_o_reg <= 25'b0;
     if(enable_i && write_i) begin
         // Write hit
         if(tag[addr_i][0][24] == 1 && (tag_i[22:0] == tag[addr_i][0][22:0])) begin // if is valid && tag are the same
