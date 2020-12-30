@@ -172,7 +172,7 @@ always@(posedge clk_i or posedge rst_i) begin
                     write_back  <= 0;
                     mem_enable  <= 1;
                     mem_write   <= 0;
-                    cache_write <= 1;
+                    cache_write <= 0;
                     state <= STATE_READMISS;
                 end
             end

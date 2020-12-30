@@ -58,7 +58,7 @@ always@(posedge clk_i or posedge rst_i) begin
             is_hit = 1;
             LRU_cache_index[addr_i] = 1;
         end 
-        if(tag[addr_i][1][24] == 1 && (tag_i[22:0] == tag[addr_i][1][22:0])) begin
+        else if(tag[addr_i][1][24] == 1 && (tag_i[22:0] == tag[addr_i][1][22:0])) begin
             cache_index = 2'b01;
             is_hit = 1;
             LRU_cache_index[addr_i] = 0;
@@ -90,17 +90,18 @@ always@(posedge clk_i or posedge rst_i) begin
             cache_index = 0;
 
         end
-        if(tag[addr_i][0][24] == 1 && (tag_i[22:0] == tag[addr_i][1][22:0])) begin
+        else if(tag[addr_i][0][24] == 1 && (tag_i[22:0] == tag[addr_i][1][22:0])) begin
             is_hit = 1;
             LRU_cache_index[addr_i] = 0;
             cache_index = 1;
         end 
         if(!is_hit) begin
-            tag[addr_i][LRU_cache_index[addr_i]][24] = {1'b1, 1'b0, tag_i[22:0]};
+            tag[addr_i][LRU_cache_index[addr_i]] = {1'b1, 1'b0, tag_i[22:0]};
+            tag_o_reg = tag[addr_i][LRU_cache_index[addr_i]];
             LRU_cache_index[addr_i] ^= 1;
         end 
         else begin
-            tag_o_reg = tag_i;
+            tag_o_reg = tag[addr_i][cache_index];
             data_o_reg = data[addr_i][cache_index];
         end
     end 
