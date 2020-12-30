@@ -52,6 +52,12 @@ always@(posedge clk_i or posedge rst_i) begin
     is_hit <= 1'b0;
     $display("0 %b\n", is_hit);
     //data_o_reg <= 25'b0;
+    // if (enable_i) begin
+    //     $display("fuckfuck\n");
+    // end
+    // if (write_i) begin
+    //     $display("inin\n");
+    // end
     if(enable_i && write_i) begin
         // Write hit
         if(tag[addr_i][0][24] == 1'b1 && (tag_i[22:0] == tag[addr_i][0][22:0])) begin // if is valid && tag are the same
