@@ -91,7 +91,7 @@ initial begin
     CPU.dcache.dcache_sram.is_hit = 1'b0;
     CPU.dcache.dcache_sram.data_o_reg = 256'b0;
     CPU.dcache.dcache_sram.tag_o_reg = 25'b0;
-    CPU.dcache.dcache_sram.cache_index = 2'b10; // 00: first cache 01: second cache 10: none
+    //CPU.dcache.dcache_sram.cache_index = 2'b10; // 00: first cache 01: second cache 10: none
 
 
     // initialize Register File
