@@ -96,8 +96,6 @@ always@(posedge clk_i or posedge rst_i) begin
             cache_index = 1;
         end 
         if(!is_hit) begin
-            tag[addr_i][LRU_cache_index[addr_i]] = {1'b1, 1'b0, tag_i[22:0]};
-            tag_o_reg = tag[addr_i][LRU_cache_index[addr_i]];
             LRU_cache_index[addr_i] ^= 1;
         end 
         else begin
