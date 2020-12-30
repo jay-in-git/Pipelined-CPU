@@ -150,6 +150,7 @@ always@(posedge clk_i or posedge rst_i) begin
     else begin
         case(state)        
             STATE_IDLE: begin
+                $display("IDLE: hit = %b, stall = %b\n", hit, cpu_stall_o);
                 if(cpu_req && !hit) begin      // wait for request
                     cache_enable <= 1;
                     state <= STATE_MISS;
@@ -198,6 +199,7 @@ always@(posedge clk_i or posedge rst_i) begin
             end
             STATE_READMISSOK: begin
                 // wait for data memory acknowledge
+                $display("READMISSOK: hit = %b, stall = %b\n", hit, cpu_stall_o);
                 // TODO: add your code here! 
                 cache_write <= 0;
                 cache_enable <= 1;
