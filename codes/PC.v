@@ -13,7 +13,6 @@ module PC
 input               clk_i;
 input               rst_i;
 input               start_i;
-input               stall_i;
 input               PCWrite_i;
 input               MemStall_i;     
 input   [31:0]      pc_i;

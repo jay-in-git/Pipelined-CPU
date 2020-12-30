@@ -198,7 +198,9 @@ always@(posedge Clk) begin
         $finish;
     end
         
-    // print PC 
+    // print PC
+    // delete state
+    $fdisplay(outfile, "state = %b, tag0 = %b, tag1 = %b\n", CPU.dcache.state, CPU.dcache.dcache_sram.tag[0][0], CPU.dcache.dcache_sram.tag[0][1]);
     $fdisplay(outfile, "cycle = %0d, Start = %b\nPC = %d", counter, Start, CPU.PC.pc_o);
     
     // print Registers
