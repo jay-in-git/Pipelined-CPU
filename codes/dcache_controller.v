@@ -145,14 +145,12 @@ always@(posedge clk_i or posedge rst_i) begin
         mem_write   = 1'b0;
         cache_write = 1'b0; 
         write_back  = 1'b0;
-        cache_enable = 1'b0;
     end
     else begin
         case(state)        
             STATE_IDLE: begin
                 $display("IDLE: hit = %b, stall = %b\n", hit, cpu_stall_o);
                 if(cpu_req && !hit) begin      // wait for request
-                    cache_enable = 1;
                     state = STATE_MISS;
                 end
                 else begin
@@ -168,7 +166,6 @@ always@(posedge clk_i or posedge rst_i) begin
                     mem_enable  = 1;
                     mem_write   = 1; 
                     cache_write = 0;
-                    cache_enable = 0;
                     state = STATE_WRITEBACK;
                 end
                 else begin
@@ -178,7 +175,6 @@ always@(posedge clk_i or posedge rst_i) begin
                     mem_enable  = 1;
                     mem_write   = 0;
                     cache_write = 0;
-                    cache_enable = 0;
                     state = STATE_READMISS;
                 end
             end
@@ -190,7 +186,6 @@ always@(posedge clk_i or posedge rst_i) begin
                     mem_enable  = 0;
                     mem_write   = 0;
                     cache_write = 1;
-                    cache_enable = 1;
                     state = STATE_READMISSOK;
                 end
                 else begin
@@ -202,7 +197,6 @@ always@(posedge clk_i or posedge rst_i) begin
                 $display("READMISSOK: hit = %b, stall = %b\n", hit, cpu_stall_o);
                 // TODO: add your code here! 
                 cache_write = 0;
-                cache_enable = 1;
                 state       = STATE_IDLE;
             end
             STATE_WRITEBACK: begin
@@ -213,7 +207,6 @@ always@(posedge clk_i or posedge rst_i) begin
                     mem_enable  = 1;
                     mem_write   = 0;
                     cache_write = 0;
-                    cache_enable = 0;
                     state = STATE_READMISS;
                 end
                 else begin
