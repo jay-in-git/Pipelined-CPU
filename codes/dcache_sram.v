@@ -49,18 +49,19 @@ always@(posedge clk_i or posedge rst_i) begin
         end
     end
     //cache_index <= 2'b10;
-    //is_hit <= 1'b0;
+    is_hit <= 1'b0;
     //data_o_reg <= 25'b0;
     if(enable_i && write_i) begin
         // Write hit
         if(tag[addr_i][0][24] == 1'b1 && (tag_i[22:0] == tag[addr_i][0][22:0])) begin // if is valid && tag are the same
             cache_index = 2'b0;
-            is_hit = 1'b1;
+            is_hit <= 1'b1;
+            
             LRU_cache_index[addr_i] = 1'b1;
         end 
         else if(tag[addr_i][1][24] == 1'b1 && (tag_i[22:0] == tag[addr_i][1][22:0])) begin
             cache_index = 2'b01;
-            is_hit = 1'b1;
+            is_hit <= 1'b1;
             LRU_cache_index[addr_i] = 1'b0;
         end
         if(is_hit) begin
@@ -73,7 +74,7 @@ always@(posedge clk_i or posedge rst_i) begin
         end
         // Write miss
         else begin
-            is_hit = 1'b0;
+            is_hit <= 1'b0;
             tag[addr_i][LRU_cache_index[addr_i]][24:0] = {1'b1, 1'b1, tag_i[22:0]};
             data[addr_i][LRU_cache_index[addr_i]] = data_i;
             tag_o_reg = tag[addr_i][LRU_cache_index[addr_i]][24:0];
@@ -85,13 +86,13 @@ always@(posedge clk_i or posedge rst_i) begin
     end
     else if(enable_i) begin
         if(tag[addr_i][0][24] == 1'b1 && (tag_i[22:0] == tag[addr_i][0][22:0])) begin
-            is_hit = 1'b1;
+            is_hit <= 1'b1;
             LRU_cache_index[addr_i] = 1'b1;
             cache_index = 1'b0;
 
         end
         else if(tag[addr_i][0][24] == 1'b1 && (tag_i[22:0] == tag[addr_i][1][22:0])) begin
-            is_hit = 1'b1;
+            is_hit <= 1'b1;
             LRU_cache_index[addr_i] = 1'b0;
             cache_index = 1'b1;
         end 
