@@ -200,7 +200,13 @@ always@(posedge Clk) begin
         
     // print PC
     // delete state
-    $fdisplay(outfile, "state = %b, tag0 = %b, tag1 = %b\n", CPU.dcache.state, CPU.dcache.dcache_sram.tag[0][0], CPU.dcache.dcache_sram.tag[0][1]);
+    $fdisplay(outfile, "controller: state = %b, index = %b, tag out = %b, hit = %b\ndcache: tag00 = %b, tag01 = %b, is_hit = %b\n", CPU.dcache.state, CPU.dcache.cache_sram_index, CPU.dcache.cache_sram_tag, CPU.dcache.hit, CPU.dcache.dcache_sram.tag[0][0], CPU.dcache.dcache_sram.tag[0][1], CPU.dcache.dcache_sram.is_hit);
+    $fdisplay(outfile, "dcache: tag10 = %b, tag11 = %b\n", CPU.dcache.dcache_sram.tag[1][0], CPU.dcache.dcache_sram.tag[1][1]);
+    // for (i = 0; i < 16; i = i + 1) begin
+    //     $fdisplay(outfile, "set %0d, tag = %b\n    data = %h\n", i, CPU.dcache.dcache_sram.tag[i][0], CPU.dcache.dcache_sram.data[i][0]);
+    //     $fdisplay(outfile, "set %0d, tag = %b\n    data = %h\n", i, CPU.dcache.dcache_sram.tag[i][1], CPU.dcache.dcache_sram.data[i][1]);
+    // end
+
     $fdisplay(outfile, "cycle = %0d, Start = %b\nPC = %d", counter, Start, CPU.PC.pc_o);
     
     // print Registers
