@@ -88,10 +88,7 @@ initial begin
         CPU.dcache.dcache_sram.data[i][1] = 256'b0;
         CPU.dcache.dcache_sram.LRU_cache_index[i] = 1'b0;
     end
-    CPU.dcache.dcache_sram.is_hit = 1'b0;
-    CPU.dcache.dcache_sram.data_o_reg = 256'b0;
-    CPU.dcache.dcache_sram.tag_o_reg = 25'b0;
-    CPU.dcache.dcache_sram.cache_index = 2'b10; // 00: first cache 01: second cache 10: none
+    //CPU.dcache.dcache_sram.cache_index = 2'b10; // 00: first cache 01: second cache 10: none
 
 
     // initialize Register File
@@ -155,7 +152,7 @@ initial begin
     
     // Load instructions into instruction memory
     // Make sure you change back to "instruction.txt" before submission
-    $readmemb("../testdata_public/instruction_1.txt", CPU.Instruction_Memory.memory);
+    $readmemb("../testdata_public/instruction_3.txt", CPU.Instruction_Memory.memory);
     
     // Open output file
     // Make sure you change back to "output.txt" before submission

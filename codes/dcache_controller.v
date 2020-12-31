@@ -104,7 +104,7 @@ assign    sram_valid = sram_cache_tag[24];
 assign    sram_dirty = sram_cache_tag[23];      
 assign    sram_tag   = sram_cache_tag[22:0];
 assign    cache_sram_index  = cpu_index;
-assign    cache_sram_enable = cache_enable;                     // cache is needed only if CPU issue a request
+assign    cache_sram_enable = cpu_req;                          // cache is needed only if CPU issue a request
 assign    cache_sram_write  = cache_write | write_hit;          // cache_write: replace a block, write_hit: write data from CPU to cache
 assign    cache_sram_tag    = {1'b1, cache_dirty, cpu_tag};     // set valid bit to 1,
 assign    cache_sram_data   = (hit) ? w_hit_data : mem_data_i;  // data to be written to cache
@@ -140,23 +140,21 @@ end
 // controller 
 always@(posedge clk_i or posedge rst_i) begin
     if(rst_i) begin
-        state       = STATE_IDLE;
-        mem_enable  = 1'b0;
-        mem_write   = 1'b0;
-        cache_write = 1'b0; 
-        write_back  = 1'b0;
-        cache_enable = 1'b0;
+        state       <= STATE_IDLE;
+        mem_enable  <= 1'b0;
+        mem_write   <= 1'b0;
+        cache_write <= 1'b0; 
+        write_back  <= 1'b0;
     end
     else begin
         case(state)        
             STATE_IDLE: begin
-                $display("IDLE: hit = %b, stall = %b\n", hit, cpu_stall_o);
+                $display("IDLE: hit <= %b, stall <= %b\n", hit, cpu_stall_o);
                 if(cpu_req && !hit) begin      // wait for request
-                    cache_enable = 1;
-                    state = STATE_MISS;
+                    state <= STATE_MISS;
                 end
                 else begin
-                    state = STATE_IDLE;
+                    state <= STATE_IDLE;
                 end
             end
             STATE_MISS: begin
@@ -164,60 +162,55 @@ always@(posedge clk_i or posedge rst_i) begin
                     // gotta replace a block  
                     // write back if dirty
                     // TODO: add your code here! 
-                    write_back  = 1;
-                    mem_enable  = 1;
-                    mem_write   = 1; 
-                    cache_write = 0;
-                    cache_enable = 0;
-                    state = STATE_WRITEBACK;
+                    write_back  <= 1;
+                    mem_enable  <= 1;
+                    mem_write   <= 1; 
+                    cache_write <= 0;
+                    state <= STATE_WRITEBACK;
                 end
                 else begin
-                    // write allocate: write miss = read miss + write hit; read miss = read miss + read hit
+                    // write allocate: write miss <= read miss + write hit; read miss <= read miss + read hit
                     // TODO: add your code here! 
-                    write_back  = 0;
-                    mem_enable  = 1;
-                    mem_write   = 0;
-                    cache_write = 0;
-                    cache_enable = 0;
-                    state = STATE_READMISS;
+                    write_back  <= 0;
+                    mem_enable  <= 1;
+                    mem_write   <= 0;
+                    cache_write <= 0;
+                    state <= STATE_READMISS;
                 end
             end
             STATE_READMISS: begin
                 if(mem_ack_i) begin
                     // wait for data memory acknowledge
                     // TODO: add your code here! 
-                    write_back  = 0;
-                    mem_enable  = 0;
-                    mem_write   = 0;
-                    cache_write = 1;
-                    cache_enable = 1;
-                    state = STATE_READMISSOK;
+                    write_back  <= 0;
+                    mem_enable  <= 0;
+                    mem_write   <= 0;
+                    cache_write <= 1;
+                    state <= STATE_READMISSOK;
                 end
                 else begin
-                    state = STATE_READMISS;
+                    state <= STATE_READMISS;
                 end
             end
             STATE_READMISSOK: begin
                 // wait for data memory acknowledge
-                $display("READMISSOK: hit = %b, stall = %b\n", hit, cpu_stall_o);
+                $display("READMISSOK: hit <= %b, stall <= %b\n", hit, cpu_stall_o);
                 // TODO: add your code here! 
-                cache_write = 0;
-                cache_enable = 1;
-                state       = STATE_IDLE;
+                cache_write <= 0;
+                state       <= STATE_IDLE;
             end
             STATE_WRITEBACK: begin
                 if(mem_ack_i) begin
                     // wait for data memory acknowledge
                     // TODO: add your code here! 
-                    write_back  = 0;
-                    mem_enable  = 1;
-                    mem_write   = 0;
-                    cache_write = 0;
-                    cache_enable = 0;
-                    state = STATE_READMISS;
+                    write_back  <= 0;
+                    mem_enable  <= 1;
+                    mem_write   <= 0;
+                    cache_write <= 0;
+                    state <= STATE_READMISS;
                 end
                 else begin
-                    state = STATE_WRITEBACK;
+                    state <= STATE_WRITEBACK;
                 end
             end
         endcase
