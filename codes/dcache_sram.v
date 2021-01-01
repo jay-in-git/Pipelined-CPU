@@ -48,14 +48,12 @@ always@(posedge clk_i or posedge rst_i) begin
             end
         end
     end
-    
     if(enable_i && write_i) begin
         // TODO: Handle your write of 2-way associative cache + LRU here
         // Write hit
         if(hit_o) begin
             tag[addr_i][cache_index] = tag_i;
             data[addr_i][cache_index] = data_i;
-            LRU_cache_index[addr_i] = 1'b1 ^ cache_index;
         end 
         else begin
             tag[addr_i][LRU_cache_index[addr_i]] = tag_i;
@@ -63,6 +61,9 @@ always@(posedge clk_i or posedge rst_i) begin
             LRU_cache_index[addr_i] ^= 1'b1;
         end 
     end
+    if(enable_i && hit_o) begin
+        LRU_cache_index[addr_i] = 1'b1 ^ cache_index; 
+    end 
 end
 
 // Read Data      
