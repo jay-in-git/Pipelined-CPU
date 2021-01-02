@@ -43,7 +43,7 @@ PC PC(
     .start_i    (start_i),
     .PCWrite_i  (Hazard_Detection_Unit.PCWrite_o),  // not determined
     .pc_i       (Mux_Branch.data_o),
-    .MemStall_i (dcache.cpu_stall_o),
+    .stall_i (dcache.cpu_stall_o),
     .pc_o       ()
 );
 
