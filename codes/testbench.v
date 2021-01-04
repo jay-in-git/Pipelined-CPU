@@ -86,7 +86,7 @@ initial begin
         CPU.dcache.dcache_sram.tag[i][1] = 25'b0;
         CPU.dcache.dcache_sram.data[i][0] = 256'b0;
         CPU.dcache.dcache_sram.data[i][1] = 256'b0;
-        CPU.dcache.dcache_sram.LRU_cache_index[i] = 1'b0;
+        CPU.dcache.dcache_sram.LRU_cache_index[i] = 2'b00;
     end
     //CPU.dcache.dcache_sram.cache_index = 2'b10; // 00: first cache 01: second cache 10: none
 
@@ -152,7 +152,7 @@ initial begin
     
     // Load instructions into instruction memory
     // Make sure you change back to "instruction.txt" before submission
-    $readmemb("../testdata_public/instruction_3.txt", CPU.Instruction_Memory.memory);
+    $readmemb("../testdata_public/instruction.txt", CPU.Instruction_Memory.memory);
     
     // Open output file
     // Make sure you change back to "output.txt" before submission
@@ -197,8 +197,6 @@ always@(posedge Clk) begin
         
     // print PC
     // delete state
-    $fdisplay(outfile, "controller: state = %b, index = %b, tag out = %b, hit = %b\ndcache: tag00 = %b, tag01 = %b, is_hit = %b\n", CPU.dcache.state, CPU.dcache.cache_sram_index, CPU.dcache.cache_sram_tag, CPU.dcache.hit, CPU.dcache.dcache_sram.tag[0][0], CPU.dcache.dcache_sram.tag[0][1], CPU.dcache.dcache_sram.is_hit);
-    $fdisplay(outfile, "dcache: tag10 = %b, tag11 = %b\n", CPU.dcache.dcache_sram.tag[1][0], CPU.dcache.dcache_sram.tag[1][1]);
     // for (i = 0; i < 16; i = i + 1) begin
     //     $fdisplay(outfile, "set %0d, tag = %b\n    data = %h\n", i, CPU.dcache.dcache_sram.tag[i][0], CPU.dcache.dcache_sram.data[i][0]);
     //     $fdisplay(outfile, "set %0d, tag = %b\n    data = %h\n", i, CPU.dcache.dcache_sram.tag[i][1], CPU.dcache.dcache_sram.data[i][1]);
